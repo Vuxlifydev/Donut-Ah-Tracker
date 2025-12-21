@@ -1,73 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Donut SMP | Live Tracker</title>
-    <style>
-        body { background: #0a0a0c; color: #00ffcc; font-family: monospace; padding: 20px; }
-        .terminal { max-width: 1000px; margin: auto; border: 1px solid #333; padding: 20px; background: #0f0f12; border-radius: 8px; }
-        .status-line { font-size: 0.8rem; margin-bottom: 15px; color: #ff4444; }
-        .online { color: #00ff66 !important; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 10px; color: #666; border-bottom: 2px solid #222; }
-        td { padding: 10px; border-bottom: 1px solid #1a1a1a; }
-    </style>
+    <meta charset="UTF-8">
+    <title>Donut SMP | Professional Stats</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="terminal">
-        <div id="status-line" class="status-line">STATUS: DISCONNECTED</div>
-        <h1>DONUT_SMP // LIVE_AH</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>ITEM</th>
-                    <th>PRICE</th>
-                    <th>SELLER</th>
-                </tr>
-            </thead>
-            <tbody id="live-table"></tbody>
-        </table>
+    <div class="dashboard">
+        <header>
+            <div class="logo">🍩 DONUT STATS <span class="badge">PRO</span></div>
+            <nav>
+                <button onclick="showSection('auction')">Auction</button>
+                <button onclick="showSection('leaderboards')">Leaderboards</button>
+            </nav>
+        </header>
+
+        <section class="hero-stats">
+            <div class="stat-card">
+                <span class="label">SERVER STATUS</span>
+                <div class="value online" id="server-status">ONLINE</div>
+            </div>
+            <div class="stat-card">
+                <span class="label">PLAYERS ONLINE</span>
+                <div class="value" id="player-count">...</div>
+            </div>
+            <div class="stat-card">
+                <span class="label">VERSION</span>
+                <div class="value">1.21.11</div>
+            </div>
+        </section>
+
+        <main id="main-content">
+            <div class="card-large">
+                <h3>LIVE AUCTION TRANSACTIONS</h3>
+                <table>
+                    <thead>
+                        <tr><th>ITEM</th><th>PRICE</th><th>BUYER</th></tr>
+                    </thead>
+                    <tbody id="live-table"></tbody>
+                </table>
+            </div>
+        </main>
     </div>
-
-    <script>
-        const API_KEY = "ab818e5ef62443d197f3903307d3ba11";
-        const PROXY = "https://corsproxy.io/?";
-        const API_URL = "https://api.donutsmp.net/v1/auction/recent";
-
-        async function fetchAH() {
-            const statusLine = document.getElementById('status-line');
-            const table = document.getElementById('live-table');
-
-            try {
-                // The proxy is required to prevent the "Browser Blocked" error on GitHub
-                const response = await fetch(PROXY + encodeURIComponent(API_URL), {
-                    headers: { 'X-API-Key': API_KEY }
-                });
-
-                if (!response.ok) throw new Error("Key Invalid or API Limit");
-
-                const data = await response.json();
-                table.innerHTML = ""; 
-
-                data.items.forEach(item => {
-                    const row = `<tr>
-                        <td style="color:#fff">${item.name}</td>
-                        <td style="color:#00ffcc">$${item.price.toLocaleString()}</td>
-                        <td>${item.seller}</td>
-                    </tr>`;
-                    table.innerHTML += row;
-                });
-
-                statusLine.innerText = "STATUS: ONLINE (LIVE DATA)";
-                statusLine.classList.add('online');
-
-            } catch (err) {
-                console.error(err);
-                statusLine.innerText = "STATUS: ERROR - CHECK CONSOLE";
-            }
-        }
-
-        setInterval(fetchAH, 15000);
-        fetchAH();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
