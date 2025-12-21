@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Donut SMP | AH Monitor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="terminal">
+    <header>
+        <div class="status-line">
+            <span id="dot" class="dot"></span> STATUS: <span id="status-text">DISCONNECTED</span>
+        </div>
+        <h1>DONUT_SMP // AUCTION_FEED</h1>
+    </header>
+
+    <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Search item name (e.g. Heart)...">
+        <div class="stat">SNIPES TRACKED: <span id="count">0</span></div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>TIME</th>
+                <th>ITEM</th>
+                <th>PRICE</th>
+                <th>SELLER -> BUYER</th>
+            </tr>
+            </thead>
+            <tbody id="live-body">
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
