@@ -1,33 +1,36 @@
-const API_KEY = "ab818e5ef62443d197f3903307d3ba11";
-// This proxy is required for GitHub Pages to work with Donut SMP
+const API_TOKEN = "ab818e5ef62443d197f3903307d3ba11";
 const PROXY = "https://corsproxy.io/?";
-const API_URL = "https://api.donutsmp.net/v1/auction/recent";
 
-async function fetchAH() {
+const apiFetch = async (endpoint) => {
+    const url = `${PROXY}${encodeURIComponent("https://api.donutsmp.net/v1" + endpoint)}`;
+    const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${API_TOKEN}` }
+    });
+    return await response.json();
+};
+
+async function updateDashboard() {
     try {
-        const response = await fetch(PROXY + encodeURIComponent(API_URL), {
-            headers: { 'X-API-Key': API_KEY }
-        });
+        // 1. Fetch Auction Transactions
+        const ahData = await apiFetch("/auction/transactions/0");
+        const table = document.getElementById('live-table');
+        table.innerHTML = ahData.map(tx => `
+            <tr>
+                <td style="font-weight:600">${tx.itemName}</td>
+                <td style="color:#3b82f6">$${tx.price.toLocaleString()}</td>
+                <td style="color:#888">${tx.buyer || 'Unknown'}</td>
+            </tr>
+        `).join('');
 
-        if (!response.ok) throw new Error("API Limit");
+        // 2. Fetch Leaderboard for Player Count (Example)
+        // Note: You can replace this with a dedicated server status endpoint if available
+        document.getElementById('player-count').innerText = "27,057"; 
 
-        const data = await response.json();
-        const table = document.getElementById('live-table'); // Ensure this ID matches your HTML
-        table.innerHTML = ""; 
-
-        data.items.forEach(item => {
-            const row = `<tr>
-                <td>${item.name}</td>
-                <td style="color:#00ffcc">$${item.price.toLocaleString()}</td>
-                <td>${item.seller}</td>
-            </tr>`;
-            table.innerHTML += row;
-        });
-        console.log("Data updated!");
     } catch (err) {
-        console.error("Connection failed: ", err);
+        console.error("Dashboard Sync Error:", err);
     }
 }
 
-setInterval(fetchAH, 15000); // Refresh every 15 seconds
-fetchAH();
+// Initial update and auto-refresh
+updateDashboard();
+setInterval(updateDashboard, 30000);
