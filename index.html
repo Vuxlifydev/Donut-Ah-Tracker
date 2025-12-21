@@ -1,39 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Donut SMP | AH Monitor</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Donut SMP | Live Tracker</title>
+    <style>
+        body { background: #0a0a0c; color: #00ffcc; font-family: monospace; padding: 20px; }
+        .terminal { max-width: 1000px; margin: auto; border: 1px solid #333; padding: 20px; background: #0f0f12; border-radius: 8px; }
+        .status-line { font-size: 0.8rem; margin-bottom: 15px; color: #ff4444; }
+        .online { color: #00ff66 !important; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px; color: #666; border-bottom: 2px solid #222; }
+        td { padding: 10px; border-bottom: 1px solid #1a1a1a; }
+    </style>
 </head>
 <body>
-<div class="terminal">
-    <header>
-        <div class="status-line">
-            <span id="dot" class="dot"></span> STATUS: <span id="status-text">DISCONNECTED</span>
-        </div>
-        <h1>DONUT_SMP // AUCTION_FEED</h1>
-    </header>
-
-    <div class="toolbar">
-        <input type="text" id="searchInput" placeholder="Search item name (e.g. Heart)...">
-        <div class="stat">SNIPES TRACKED: <span id="count">0</span></div>
-    </div>
-
-    <div class="table-container">
+    <div class="terminal">
+        <div id="status-line" class="status-line">STATUS: DISCONNECTED</div>
+        <h1>DONUT_SMP // LIVE_AH</h1>
         <table>
             <thead>
-            <tr>
-                <th>TIME</th>
-                <th>ITEM</th>
-                <th>PRICE</th>
-                <th>SELLER -> BUYER</th>
-            </tr>
+                <tr>
+                    <th>ITEM</th>
+                    <th>PRICE</th>
+                    <th>SELLER</th>
+                </tr>
             </thead>
-            <tbody id="live-body">
-            </tbody>
+            <tbody id="live-table"></tbody>
         </table>
     </div>
-</div>
-<script src="script.js"></script>
+
+    <script>
+        const API_KEY = "ab818e5ef62443d197f3903307d3ba11";
+        const PROXY = "https://corsproxy.io/?";
+        const API_URL = "https://api.donutsmp.net/v1/auction/recent";
+
+        async function fetchAH() {
+            const statusLine = document.getElementById('status-line');
+            const table = document.getElementById('live-table');
+
+            try {
+                // The proxy is required to prevent the "Browser Blocked" error on GitHub
+                const response = await fetch(PROXY + encodeURIComponent(API_URL), {
+                    headers: { 'X-API-Key': API_KEY }
+                });
+
+                if (!response.ok) throw new Error("Key Invalid or API Limit");
+
+                const data = await response.json();
+                table.innerHTML = ""; 
+
+                data.items.forEach(item => {
+                    const row = `<tr>
+                        <td style="color:#fff">${item.name}</td>
+                        <td style="color:#00ffcc">$${item.price.toLocaleString()}</td>
+                        <td>${item.seller}</td>
+                    </tr>`;
+                    table.innerHTML += row;
+                });
+
+                statusLine.innerText = "STATUS: ONLINE (LIVE DATA)";
+                statusLine.classList.add('online');
+
+            } catch (err) {
+                console.error(err);
+                statusLine.innerText = "STATUS: ERROR - CHECK CONSOLE";
+            }
+        }
+
+        setInterval(fetchAH, 15000);
+        fetchAH();
+    </script>
 </body>
 </html>
